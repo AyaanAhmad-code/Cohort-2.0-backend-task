@@ -1,0 +1,148 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root, main {
+  height: 100%;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  font-family: system-ui, sans-serif;
+  color: #fff;
+}
+
+/* NAVBAR */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  border-bottom: 1px solid #333;
+}
+
+.nav-right {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.new-btn {
+  background: #f5c16c;
+  color: #000;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+/* ADD FORM */
+.add-form {
+  display: flex;
+  gap: 15px;
+  padding: 25px 40px;
+}
+
+.add-form input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 20px;
+  border: none;
+  background: #111;
+  color: #fff;
+}
+
+.create-btn {
+  background: #22c55e;
+  color: #000;
+  padding: 12px 18px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+}
+
+/* NOTES */
+.notes {
+  display: flex;
+  gap: 30px;
+  padding: 40px;
+  flex-wrap: wrap;
+}
+
+.note {
+  width: 280px;
+  padding: 20px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 30px rgba(255,255,255,0.05);
+}
+
+.note h2 {
+  color: #f5c16c;
+  margin-bottom: 10px;
+}
+
+.note p {
+  opacity: 0.85;
+}
+
+/* EDIT FORM */
+.edit-form input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  margin-bottom: 10px;
+}
+
+/* ACTIONS */
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.delete-btn {
+  background: #ef4444;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: #fff;
+}
+
+.edit-btn {
+  background: #f5c16c;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+
+.cancel-btn {
+  background: #555;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+
+/* FOOTER */
+footer {
+  margin-top: auto;
+  padding: 20px;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.socials {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.socials button {
+  background: #444;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: none;
+}
