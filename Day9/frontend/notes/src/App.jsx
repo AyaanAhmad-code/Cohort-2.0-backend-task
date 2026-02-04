@@ -6,7 +6,7 @@ export default function App() {
   const [editId, setEditId] = useState(null);
   const [editDesc, setEditDesc] = useState("");
 
-  const API = "http://localhost:3000/api/notes";
+  const API = "https://cohort-2-0-backend-task.onrender.com/api/notes";
 
   useEffect(() => {
     fetchNotes();
