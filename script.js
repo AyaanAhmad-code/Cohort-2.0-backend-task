@@ -334,7 +334,7 @@
 // newWords.forEach(element => {
 //     if(element.length>= reference.length){
 //         reference = element;
-//     }    
+//     }
 // });
 // console.log(reference);
 
@@ -587,8 +587,141 @@
 // console.log(pattern)
 
 // let numbers = [5, 3, 7, 5, 9, 5, 2, 7, 5, 1];
-// let squarred = []; 
+// let squarred = [];
 // numbers.forEach(element => {
 //     squarred.push(element**2);
 // });
 // console.log(squarred);
+
+// let sum = 0;
+// for(let i = 1;i<=50;i++){
+//     if(i % 2 != 0){
+//         sum += i;
+//     }
+// }
+// console.log(sum);
+
+// let object = {
+//     fullName: "Ayaan Ahmad",
+//     age: 21
+// }
+// console.log(object.fullName);
+
+// let number = "5";
+// console.log(+number + 5);
+
+// let arr = [10,20,30,40,50,60,70,80,90]
+// let last = arr.pop();
+// arr.unshift(last)
+// console.log(arr);
+
+// let arr = []
+// if(arr.length === 0){
+//     console.log("the array is empty");
+// }
+
+// let date = new Date();
+// let day = String(date.getDate()).padStart(2,0);
+// let month = String(date.getMonth() + 1).padStart(2,0);
+// let year = date.getFullYear();
+
+// console.log(`${day}/${month}/${year}`);
+
+// let arr = [25,65,87,8,35,24,4,5,2,1]
+// console.log(Math.min(...arr));
+
+// function fibonacci(n){
+//     let fibo = [0,1];
+//     for(let i = 2;i<n;i++){
+//         fibo[i] = fibo[i-1] + fibo[i-2];
+//     }
+//     return fibo;
+// }
+
+// console.log(fibonacci(6));
+
+// try {
+//     let numerator = 15;
+//     let denominator = 0;
+
+//     if (denominator === 0) {
+//         throw new Error("Cannot divide by zero");
+//     }
+
+//     let result = numerator / denominator;
+//     console.log(result);
+
+// } catch (err) {
+//     console.log(err.message);
+// }
+
+// function repeatChecker(str) {
+//   let seen = {};
+//   for (let i = 0; i < str.length; i++) {
+//     let char = str[i];
+//     if (seen[char]) {
+//       return i;
+//     }
+//     seen[char] = true;
+//   }
+//   return -1;
+// }
+// console.log(repeatChecker("javascript"));
+
+// let arr = [10,20,30,30,50,60,40,70,60,50]
+// let seen = {}
+// let newArr = []
+// arr.forEach(element => {
+//     if(!seen[element]){
+//        newArr.push(element)
+//     }
+//     seen[element] = true
+// });
+// console.log(newArr);
+
+// let arr1= [10,20,30,40,50,60]
+// let arr2= [5,15,25,35,45,55,65,75]
+// let newSortedArr = []
+// let i = 0;
+// let j = 0
+// while(i < arr1.length && j < arr2.length){
+//     if(arr1[i]<arr2[j]){
+//         newSortedArr.push(arr1[i])
+//         i++
+//     }else{
+//         newSortedArr.push(arr2[j])
+//         j++
+//     }
+// }
+// while (i < arr1.length) {
+//     newSortedArr.push(arr1[i]);
+//     i++;
+// }
+
+// while (j < arr2.length) {
+//     newSortedArr.push(arr2[j]);
+//     j++;
+// }
+
+// console.log(newSortedArr);
+
+// let str = "javascript"
+// console.log(str.length);
+
+// let btn = document.querySelector("button");
+// btn.addEventListener('click',()=>{
+//     if (btn.classList.contains("red")) {
+//         btn.classList.remove("red");
+//         btn.classList.add("blue");
+//     } else {
+//         btn.classList.remove("blue");
+//         btn.classList.add("red");
+//     }
+// })
+
+// let numbers = [12, 18, 25, 30, 40];
+// let value = 10;
+
+// let result = numbers.every(num => num > value);
+
+// console.log(result);
