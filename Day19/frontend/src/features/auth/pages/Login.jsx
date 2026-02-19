@@ -18,6 +18,8 @@ const Login = () => {
         }).then(res=>{
             console.log(res.data)
         })
+        setPassword("")
+        setUsername("")
     }
   return (
     <main>

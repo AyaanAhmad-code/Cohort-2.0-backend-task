@@ -20,6 +20,9 @@ const Register = () => {
         }).then((res)=>{
             console.log(res.data);
         })
+        setUsername("")
+        setEmail("")
+        setPassword("")
     }
 
 
