@@ -2,20 +2,29 @@ import React, { useState } from 'react'
 import { Link } from 'react-router'
 import { useAuth } from "../hooks/useAuth";
 import "../style/form.scss"
+import { useNavigate } from 'react-router'
 
 const Register = () => {
+
+    const { user, loading, handleRegister } = useAuth()
+
     const [username, setUsername] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
-    const {handleRegister} = useAuth()
 
     async function handleSubmit(e) {
         e.preventDefault();
 
-        handleRegister(username,email,password).then(res=>{
-            console.log(res)
-        })
+        await handleRegister(username,email, password)
+
+        navigate('/')
+    }
+
+    if (loading) {
+        return (<main>
+            <h1>Loading.....</h1>
+        </main>)
     }
 
 
@@ -39,9 +48,9 @@ const Register = () => {
                         type="password"
                         name='password'
                         placeholder='Enter password' />
-                    <button>Register</button>
+                    <button className='button primary-button'>Register</button>
             </form>
-            <p>Already have an account? <Link className='toggleAuthForm' to="/login">Login</Link></p>
+            <p>Already have an account ? <Link to={"/login"} >Login to account.</Link></p>
         </div>
     </main>
   )
