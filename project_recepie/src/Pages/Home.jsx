@@ -1,12 +1,16 @@
 import React, { useContext, useMemo } from 'react'
 import RecipeCard from '../components/RecipeCard'
 import { recipeContext } from '../context/RecipeContext'
+import { Link } from 'react-router-dom'
 
 const Home = () => {
-  const { data } = useContext(recipeContext)
+  const { data, getFavoritedRecipes } = useContext(recipeContext)
   
   // Memoize featured recipes to prevent unnecessary re-renders
   const featured = useMemo(() => data.slice(0, 6), [data])
+
+  // Memoize favorited recipes
+  const favorites = useMemo(() => getFavoritedRecipes(), [getFavoritedRecipes])
 
   // Memoize category buttons to prevent re-creation
   const categories = useMemo(() => ['Breakfast','Dinner','Vegan','Dessert','Quick'], [])
@@ -52,6 +56,30 @@ const Home = () => {
             ))}
           </div>
         </div>
+
+        {/* Favorites Section */}
+        {favorites.length > 0 && (
+          <div className="mt-12">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-2xl font-semibold flex items-center gap-2">❤️ Your Favorites <span className="text-amber-400 text-lg">({favorites.length})</span></h2>
+                <p className="text-gray-400 mt-1">Your saved favorite recipes.</p>
+              </div>
+              <Link 
+                to="/favorites"
+                className="bg-amber-500 hover:bg-amber-600 text-black font-bold px-4 py-2 rounded-lg transition"
+              >
+                View All →
+              </Link>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {favorites.slice(0, 3).map((recipe) => (
+                <RecipeCard key={recipe.id} recipe={recipe} />
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-12 pb-8">
           <h2 className="text-2xl font-semibold">Popular Categories</h2>

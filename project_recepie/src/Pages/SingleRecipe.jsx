@@ -7,10 +7,11 @@ import { toast } from "react-toastify";
 
 const SingleRecipe = () => {
     
-  const { data, setData } = useContext(recipeContext);
+  const { data, setData, toggleFavorite, isFavorited } = useContext(recipeContext);
   const id = useParams().id;
   const recipe = data.find((recipe) => recipe.id === id);
   const [preview, setPreview] = useState("");
+  const isFav = isFavorited(id);
 
   const navigate = useNavigate();
   const { register, handleSubmit, reset, watch } = useForm();
@@ -87,8 +88,17 @@ const SingleRecipe = () => {
                 </div>
 
                 {/* Recipe Info */}
-                <div className="bg-linear-to-br from-gray-800/60 to-gray-900/60 rounded-2xl p-6 border border-gray-700 shadow-lg">
-                  <h1 className="text-3xl font-bold text-white mb-2">{recipe.title}</h1>
+                <div className="bg-linear-to-br from-gray-800/60 to-gray-900/60 rounded-2xl p-6 border border-gray-700 shadow-lg relative">
+                  {/* Favorite Button */}
+                  <button
+                    onClick={() => toggleFavorite(id)}
+                    className="absolute top-4 right-4 text-4xl hover:scale-125 transition transform"
+                    title={isFav ? "Remove from favorites" : "Add to favorites"}
+                  >
+                    {isFav ? '❤️' : '🤍'}
+                  </button>
+
+                  <h1 className="text-3xl font-bold text-white mb-2 pr-12">{recipe.title}</h1>
                   
                   <div className="space-y-3 text-sm">
                     <div>

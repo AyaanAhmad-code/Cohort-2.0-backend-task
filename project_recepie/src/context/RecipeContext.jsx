@@ -254,6 +254,26 @@ const saveRecipesToStorage = (recipes) => {
   }
 }
 
+// Utility function to get favorites from localStorage
+const getStoredFavorites = () => {
+  try {
+    const stored = localStorage.getItem('favorites');
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Error reading favorites from localStorage:', error);
+    return [];
+  }
+}
+
+// Utility function to save favorites to localStorage
+const saveFavoritesToStorage = (favorites) => {
+  try {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  } catch (error) {
+    console.error('Error saving favorites to localStorage:', error);
+  }
+}
+
 const RecipeContext = (props) => {
   // Initialize state with localStorage data or seeded data
   const [data, setData] = useState(() => {
@@ -261,13 +281,38 @@ const RecipeContext = (props) => {
     return stored && stored.length > 0 ? stored : seeded;
   });
 
-  // Sync state changes to localStorage
+  // Initialize favorites from localStorage
+  const [favorites, setFavorites] = useState(() => getStoredFavorites());
+
+  // Sync recipes to localStorage
   useEffect(() => {
     saveRecipesToStorage(data);
   }, [data])
 
+  // Sync favorites to localStorage
+  useEffect(() => {
+    saveFavoritesToStorage(favorites);
+  }, [favorites])
+
+  // Toggle favorite status for a recipe
+  const toggleFavorite = (recipeId) => {
+    setFavorites(prevFavorites => 
+      prevFavorites.includes(recipeId)
+        ? prevFavorites.filter(id => id !== recipeId)
+        : [...prevFavorites, recipeId]
+    );
+  }
+
+  // Check if recipe is favorited
+  const isFavorited = (recipeId) => favorites.includes(recipeId);
+
+  // Get all favorited recipes
+  const getFavoritedRecipes = () => data.filter(recipe => favorites.includes(recipe.id));
+
   return (
-    <recipeContext.Provider value={{data, setData}}>{props.children}</recipeContext.Provider>
+    <recipeContext.Provider value={{data, setData, favorites, toggleFavorite, isFavorited, getFavoritedRecipes}}>
+      {props.children}
+    </recipeContext.Provider>
   )
 }
 
