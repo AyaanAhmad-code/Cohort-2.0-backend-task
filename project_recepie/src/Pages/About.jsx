@@ -1,12 +1,26 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 
 const About = () => {
+  // Memoize mission features to prevent re-creation
+  const missionFeatures = useMemo(() => [
+    { title: 'Global Recipes', desc: 'Cuisines from every corner of the world' },
+    { title: 'Expert Chefs', desc: 'Recipes crafted by professional chefs' },
+    { title: 'Easy to Follow', desc: 'Clear instructions for all skill levels' }
+  ], [])
+
+  // Memoize why choose us sections
+  const whyChooseUs = useMemo(() => [
+    { count: '24+', title: 'Recipes', desc: 'A growing collection of handpicked recipes for every occasion.' },
+    { count: '🌍', title: 'World Class', desc: 'Recipes from talented chefs spanning multiple cuisines and styles.' },
+    { count: '⚡', title: 'Quick & Easy', desc: 'Find recipes by category, time, or difficulty level with ease.' }
+  ], [])
+
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-950 to-black text-gray-100">
+    <main className="min-h-screen bg-linear-to-b from-gray-900 via-gray-950 to-black text-gray-100">
       <div className="max-w-5xl mx-auto px-6 py-16">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <h1 className="text-5xl sm:text-6xl font-extrabold leading-tight mb-4 bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+          <h1 className="text-5xl sm:text-6xl font-extrabold leading-tight mb-4 bg-linear-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
             About Abest Food
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -25,29 +39,17 @@ const About = () => {
               We bring you authentic recipes from talented chefs worldwide, making it easy for anyone to create delicious, restaurant-quality dishes at home.
             </p>
           </div>
-          <div className="bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-2xl p-8">
+          <div className="bg-linear-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/30 rounded-2xl p-8">
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <span className="text-2xl font-bold text-amber-400">✓</span>
-                <div>
-                  <h3 className="font-bold text-white">Global Recipes</h3>
-                  <p className="text-sm text-gray-400">Cuisines from every corner of the world</p>
+              {missionFeatures.map((feature, idx) => (
+                <div key={idx} className="flex items-start gap-3">
+                  <span className="text-2xl font-bold text-amber-400">✓</span>
+                  <div>
+                    <h3 className="font-bold text-white">{feature.title}</h3>
+                    <p className="text-sm text-gray-400">{feature.desc}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-2xl font-bold text-amber-400">✓</span>
-                <div>
-                  <h3 className="font-bold text-white">Expert Chefs</h3>
-                  <p className="text-sm text-gray-400">Recipes crafted by professional chefs</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="text-2xl font-bold text-amber-400">✓</span>
-                <div>
-                  <h3 className="font-bold text-white">Easy to Follow</h3>
-                  <p className="text-sm text-gray-400">Clear instructions for all skill levels</p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -56,26 +58,18 @@ const About = () => {
         <div className="mb-16">
           <h2 className="text-4xl font-bold mb-8 text-center text-white">Why Choose Abest Food?</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 hover:border-amber-500/50 transition">
-              <div className="text-4xl font-bold text-amber-400 mb-3">24+</div>
-              <h3 className="text-xl font-bold text-white mb-2">Recipes</h3>
-              <p className="text-gray-400">A growing collection of handpicked recipes for every occasion.</p>
-            </div>
-            <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 hover:border-amber-500/50 transition">
-              <div className="text-4xl font-bold text-amber-400 mb-3">🌍</div>
-              <h3 className="text-xl font-bold text-white mb-2">World Class</h3>
-              <p className="text-gray-400">Recipes from talented chefs spanning multiple cuisines and styles.</p>
-            </div>
-            <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 hover:border-amber-500/50 transition">
-              <div className="text-4xl font-bold text-amber-400 mb-3">⚡</div>
-              <h3 className="text-xl font-bold text-white mb-2">Quick & Easy</h3>
-              <p className="text-gray-400">Find recipes by category, time, or difficulty level with ease.</p>
-            </div>
+            {whyChooseUs.map((item, idx) => (
+              <div key={idx} className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 hover:border-amber-500/50 transition">
+                <div className="text-4xl font-bold text-amber-400 mb-3">{item.count}</div>
+                <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                <p className="text-gray-400">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Team Section */}
-        <div className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-gray-700 rounded-2xl p-12 mb-16">
+        <div className="bg-linear-to-r from-amber-500/10 to-orange-500/10 border border-gray-700 rounded-2xl p-12 mb-16">
           <h2 className="text-4xl font-bold text-white mb-6 text-center">Our Team</h2>
           <p className="text-lg text-gray-300 text-center max-w-3xl mx-auto">
             Abest Food is built by food enthusiasts and developers passionate about making great recipes accessible to everyone. We're constantly working to improve the platform and bring you the best culinary experiences.

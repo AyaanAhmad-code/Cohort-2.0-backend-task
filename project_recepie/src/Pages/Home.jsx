@@ -1,10 +1,23 @@
-import React, { useContext } from 'react'
+import React, { useContext, useMemo } from 'react'
 import RecipeCard from '../components/RecipeCard'
 import { recipeContext } from '../context/RecipeContext'
 
 const Home = () => {
   const { data } = useContext(recipeContext)
-  const featured = data.slice(0, 6)
+  
+  // Memoize featured recipes to prevent unnecessary re-renders
+  const featured = useMemo(() => data.slice(0, 6), [data])
+
+  // Memoize category buttons to prevent re-creation
+  const categories = useMemo(() => ['Breakfast','Dinner','Vegan','Dessert','Quick'], [])
+
+  // Memoize things to do list
+  const thingsToDo = useMemo(() => [
+    { title: 'Meal Prep Like a Pro', desc: 'Batch cook staples to save time during the week.' },
+    { title: 'Host a Theme Night', desc: 'Pick a cuisine and invite friends for a shared menu.' },
+    { title: 'Pair With Drinks', desc: 'Simple wine or mocktail pairings for each dish.' },
+    { title: 'Cook With Kids', desc: 'Easy, safe tasks to get little chefs involved.' }
+  ], [])
 
   return (
     <main className="min-h-screen">
@@ -43,7 +56,7 @@ const Home = () => {
         <div className="mt-12 pb-8">
           <h2 className="text-2xl font-semibold">Popular Categories</h2>
           <div className="mt-4 flex flex-wrap gap-3">
-            {['Breakfast','Dinner','Vegan','Dessert','Quick'].map(cat => (
+            {categories.map(cat => (
               <button key={cat} className="px-4 py-2 rounded-full bg-gray-800 border border-gray-700 text-gray-200 text-sm hover:bg-amber-500/90 hover:text-black transition">{cat}</button>
             ))}
           </div>
@@ -54,12 +67,7 @@ const Home = () => {
           <p className="text-gray-400 mt-1">Practical ideas to make cooking fun and effortless.</p>
 
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { title: 'Meal Prep Like a Pro', desc: 'Batch cook staples to save time during the week.' },
-              { title: 'Host a Theme Night', desc: 'Pick a cuisine and invite friends for a shared menu.' },
-              { title: 'Pair With Drinks', desc: 'Simple wine or mocktail pairings for each dish.' },
-              { title: 'Cook With Kids', desc: 'Easy, safe tasks to get little chefs involved.' }
-            ].map(item => (
+            {thingsToDo.map(item => (
               <div key={item.title} className="p-4 bg-gray-800/50 rounded-xl border border-gray-700">
                 <h3 className="text-sm font-semibold text-gray-100">{item.title}</h3>
                 <p className="text-xs text-gray-300 mt-2">{item.desc}</p>

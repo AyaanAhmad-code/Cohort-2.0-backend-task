@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { recipeContext } from "../context/RecipeContext";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -16,9 +16,10 @@ const SingleRecipe = () => {
   const { register, handleSubmit, reset, watch } = useForm();
   const imageUrl = watch("image");
 
+  // Single optimized useEffect for form initialization
   useEffect(() => {
     if (recipe) {
-      reset({
+      const formData = {
         image: recipe.image,
         title: recipe.title,
         chef: recipe.chef,
@@ -26,29 +27,37 @@ const SingleRecipe = () => {
         ingredients: recipe.ingredients,
         instructions: recipe.instructions,
         category: recipe.category,
-      })
+      };
+      reset(formData);
       setPreview(recipe.image);
     }
-  }, [recipe, reset])
+  }, [recipe?.id]) // Only depend on recipe ID to avoid excessive resets
 
+  // Separate useEffect for image preview updates
   useEffect(() => {
-    setPreview(imageUrl);
+    if (imageUrl) {
+      setPreview(imageUrl);
+    }
   }, [imageUrl])
 
-  const submitHandler = (recipe) => {
+  // Memoized submit handler to prevent unnecessary recreations
+  const submitHandler = useCallback((formData) => {
     const recipeIndex = data.findIndex((r) => r.id === id);
-    const updatedData = [...data];
-    updatedData[recipeIndex] = {...updatedData[recipeIndex], ...recipe };
-    setData(updatedData);
-    toast.success("Recipe updated successfully!");
-  };
+    if (recipeIndex !== -1) {
+      const updatedData = [...data];
+      updatedData[recipeIndex] = {...updatedData[recipeIndex], ...formData };
+      setData(updatedData);
+      toast.success("Recipe updated successfully!");
+    }
+  }, [data, id, setData]);
 
-  const deleteHandler = () =>{
+  // Memoized delete handler to prevent unnecessary recreations
+  const deleteHandler = useCallback(() => {
     const filteredData = data.filter((r) => r.id !== id);
     setData(filteredData);
     toast.success("Recipe deleted successfully!");
     navigate("/recipes");
-  }
+  }, [data, id, setData, navigate])
 
   return (
     <div className="min-h-screen bg-linear-to-b from-gray-900 via-gray-950 to-black py-8 px-4 md:px-8">

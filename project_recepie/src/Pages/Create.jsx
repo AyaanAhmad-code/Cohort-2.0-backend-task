@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { nanoid } from "nanoid";
-import { useContext, useState } from "react";
+import { useContext, useState, useCallback } from "react";
 import { recipeContext } from "../context/RecipeContext";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -9,17 +9,27 @@ const Create = () => {
     const navigate = useNavigate()
     const {data, setData} = useContext(recipeContext)
     const {register,handleSubmit,reset} = useForm()
+    const [preview, setPreview] = useState("")
 
-    const submitHandler = (recipe) => {
-  
-      recipe.id = nanoid();
+    // Memoized submit handler to prevent unnecessary recreations
+    const submitHandler = useCallback((recipe) => {
+      const newRecipe = {
+        ...recipe,
+        id: nanoid()
+      };
       
-      setData([...data, recipe]);
+      setData([...data, newRecipe]);
       toast.success("Recipe created successfully!");
       reset();
+      setPreview("");
       navigate("/recipes");
-    }
-  const [preview, setPreview] = useState("")
+    }, [data, setData, reset, navigate])
+
+    // Memoized reset handler
+    const resetHandler = useCallback(() => {
+      reset();
+      setPreview("");
+    }, [reset])
 
   return (
     <div className="min-h-screen flex items-start justify-center py-12">
@@ -67,7 +77,7 @@ const Create = () => {
 
               <div className="flex gap-3">
                 <button type="submit" className="bg-amber-500 text-black px-4 py-2 rounded-lg font-medium">Create Recipe</button>
-                <button type="button" onClick={() => { reset(); setPreview("") }} className="bg-gray-800 border border-gray-700 px-4 py-2 rounded-lg text-gray-200">Reset</button>
+                <button type="button" onClick={resetHandler} className="bg-gray-800 border border-gray-700 px-4 py-2 rounded-lg text-gray-200">Reset</button>
               </div>
             </div>
           </div>
