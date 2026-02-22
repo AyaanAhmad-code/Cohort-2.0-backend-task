@@ -19,7 +19,7 @@ const Create = () => {
       };
       
       setData([...data, newRecipe]);
-      toast.success("Recipe created successfully!");
+      toast.success("✓ Recipe created and saved to storage!");
       reset();
       setPreview("");
       navigate("/recipes");

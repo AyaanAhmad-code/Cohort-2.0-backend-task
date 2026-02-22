@@ -1,4 +1,4 @@
-import React, { useState, createContext } from 'react'
+import React, { useState, createContext, useEffect } from 'react'
 import { nanoid } from 'nanoid'
 
 export const recipeContext = createContext(null);
@@ -231,10 +231,41 @@ const sampleRecipes = [
   }
 ]
 
+// Initialize with seeded data with IDs
 const seeded = sampleRecipes.map(r => ({ id: nanoid(), ...r }))
 
+// Utility function to get recipes from localStorage
+const getStoredRecipes = () => {
+  try {
+    const stored = localStorage.getItem('recipes');
+    return stored ? JSON.parse(stored) : null;
+  } catch (error) {
+    console.error('Error reading from localStorage:', error);
+    return null;
+  }
+}
+
+// Utility function to save recipes to localStorage
+const saveRecipesToStorage = (recipes) => {
+  try {
+    localStorage.setItem('recipes', JSON.stringify(recipes));
+  } catch (error) {
+    console.error('Error saving to localStorage:', error);
+  }
+}
+
 const RecipeContext = (props) => {
-    const [data, setData] = useState(seeded)
+  // Initialize state with localStorage data or seeded data
+  const [data, setData] = useState(() => {
+    const stored = getStoredRecipes();
+    return stored && stored.length > 0 ? stored : seeded;
+  });
+
+  // Sync state changes to localStorage
+  useEffect(() => {
+    saveRecipesToStorage(data);
+  }, [data])
+
   return (
     <recipeContext.Provider value={{data, setData}}>{props.children}</recipeContext.Provider>
   )

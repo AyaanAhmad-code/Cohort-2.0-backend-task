@@ -47,7 +47,7 @@ const SingleRecipe = () => {
       const updatedData = [...data];
       updatedData[recipeIndex] = {...updatedData[recipeIndex], ...formData };
       setData(updatedData);
-      toast.success("Recipe updated successfully!");
+      toast.success("✓ Recipe updated and saved to storage!");
     }
   }, [data, id, setData]);
 
@@ -55,7 +55,7 @@ const SingleRecipe = () => {
   const deleteHandler = useCallback(() => {
     const filteredData = data.filter((r) => r.id !== id);
     setData(filteredData);
-    toast.success("Recipe deleted successfully!");
+    toast.success("✓ Recipe deleted and removed from storage!");
     navigate("/recipes");
   }, [data, id, setData, navigate])
 
