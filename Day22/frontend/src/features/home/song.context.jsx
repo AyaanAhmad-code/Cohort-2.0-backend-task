@@ -10,11 +10,11 @@ export const SongContextProvider = ({children}) =>{
         "title": "Main Hoon - PagalNew",
         "mood": "happy",
     })
-
+    const [ songsList, setSongsList ] = useState([]);
     const [loading, setLoading] = useState(false)
 
     return (
-        <songContext.Provider value={{loading,setLoading,song, setSong}}>
+        <songContext.Provider value={{loading,setLoading,song, setSong, songsList, setSongsList}}>
             {children}
         </songContext.Provider>
     )

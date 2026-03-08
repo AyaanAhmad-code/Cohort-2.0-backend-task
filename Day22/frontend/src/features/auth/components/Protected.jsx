@@ -1,24 +1,27 @@
-import React from 'react'
-import { useAuth } from '../hooks/useAuth'
-import { Navigate, useNavigate } from 'react-router';
+import React from 'react';
+import { useAuth } from '../hooks/useAuth';
+import { Navigate } from 'react-router';
+import '../style/loader.scss'; // We will create this file next
 
-const Protected = ({children}) => {
-  
-    const {
-        user,loading
-    }= useAuth();
+const Protected = ({ children }) => {
+    const { user, loading } = useAuth();
 
-    const navigate = useNavigate()
-
-    if(loading){
-        return <h1>Loading...</h1>
+    if (loading) {
+        // Return a sleek, theme-matching full-screen loader
+        return (
+            <div className="fullscreen-loader">
+                <div className="spinner"></div>
+                <p>Loading Moodify...</p>
+            </div>
+        );
     }
 
-    if(!user){
-        return <Navigate to="/login" />
+    if (!user) {
+        // 'replace' prevents the redirect from cluttering the browser's back history
+        return <Navigate to="/login" replace />;
     }
 
-    return children
-}
+    return children;
+};
 
-export default Protected
+export default Protected;

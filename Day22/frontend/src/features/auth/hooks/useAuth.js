@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 export const useAuth = () =>{
     const context = useContext(authContext);
-    const {loading,user,setUser,setLoading} = context;
+    const {loading,user,setUser,setLoading,hasFetched} = context;
 
     async function handleRegister({username,email,password}){
         setLoading(true)
@@ -23,9 +23,16 @@ export const useAuth = () =>{
 
     async function handleGetMe(){
         setLoading(true)
-        const data = await getMe()
-        setUser(data.user)
-        setLoading(false)
+        try {
+            const data = await getMe()
+            setUser(data.user)
+        } catch (error) {
+            // If backend says not logged in, just clear the user
+            setUser(null)
+        } finally {
+            // Always turn off the loading screen, even if it fails!
+            setLoading(false)
+        }
     }
 
     async function handleLogout() {
@@ -36,7 +43,12 @@ export const useAuth = () =>{
     }
 
     useEffect(()=>{
-        handleGetMe();
+        // NEW: Only run handleGetMe if it hasn't been run yet.
+        // This completely stops the infinite flashing loop!
+        if (!hasFetched.current) {
+            hasFetched.current = true;
+            handleGetMe();
+        }
     },[])
 
     return ({handleLogin,handleRegister,handleGetMe,handleLogout,user,loading})

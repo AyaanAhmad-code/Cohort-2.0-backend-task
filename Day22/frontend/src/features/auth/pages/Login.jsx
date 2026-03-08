@@ -76,10 +76,9 @@ const Login = () => {
                     </div>
                     <button 
                         className="button" 
-                        type="submit" 
-                        disabled={loading} // Re-added the loading check so users can't spam the button
+                        type="submit" // Re-added the loading check so users can't spam the button
                     >
-                        {loading ? 'Logging in...' : 'Login'}
+                        Login
                     </button>
                 </form>
                 

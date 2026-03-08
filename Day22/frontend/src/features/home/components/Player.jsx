@@ -12,7 +12,8 @@ const formatTime = (seconds) => {
 }
 
 const Player = () => {
-    const { song } = useSong()
+    // Destructured nextTrack and prevTrack for playlist navigation
+    const { song, nextTrack, prevTrack } = useSong()
 
     const audioRef = useRef(null)
     const progressRef = useRef(null)
@@ -29,7 +30,12 @@ const Player = () => {
     useEffect(() => {
         if (audioRef.current) {
             audioRef.current.load()
-            setIsPlaying(false)
+            
+            // Auto-play when a new song is loaded from the playlist
+            const playPromise = audioRef.current.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+            }
             setCurrentTime(0)
         }
     }, [song?.url])
@@ -43,12 +49,6 @@ const Player = () => {
             audio.play()
         }
         setIsPlaying(!isPlaying)
-    }
-
-    const skip = (secs) => {
-        const audio = audioRef.current
-        if (!audio) return
-        audio.currentTime = Math.min(Math.max(audio.currentTime + secs, 0), duration)
     }
 
     const handleTimeUpdate = () => {
@@ -92,9 +92,11 @@ const Player = () => {
         }
     }
 
+    // Auto-advance to the next song when current track ends
     const handleSongEnd = () => {
         setIsPlaying(false)
         setCurrentTime(0)
+        if (nextTrack) nextTrack() 
     }
 
     const progress = duration ? (currentTime / duration) * 100 : 0
@@ -124,23 +126,55 @@ const Player = () => {
                 </div>
             </div>
 
-            {/* Progress bar */}
-            <div className="player__progress-wrap">
-                <span className="player__time">{formatTime(currentTime)}</span>
-                <div
-                    className="player__progress"
-                    ref={progressRef}
-                    onClick={handleProgressClick}
-                >
-                    <div className="player__progress-fill" style={{ width: `${progress}%` }} />
-                    <div className="player__progress-thumb" style={{ left: `${progress}%` }} />
+            {/* Controls */}
+            <div className="player__controls-container">
+                <div className="player__controls">
+                    {/* Previous Track */}
+                    <button className="player__btn player__btn--nav" onClick={prevTrack} title="Previous Track">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                            <path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/>
+                        </svg>
+                    </button>
+
+                    {/* Play / Pause */}
+                    <button className="player__btn player__btn--play" onClick={togglePlay} title={isPlaying ? 'Pause' : 'Play'}>
+                        {isPlaying ? (
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                                <rect x="6" y="4" width="4" height="16" rx="1"/>
+                                <rect x="14" y="4" width="4" height="16" rx="1"/>
+                            </svg>
+                        ) : (
+                            <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24" style={{ marginLeft: '4px' }}>
+                                <path d="M8 5.14v14l11-7-11-7z"/>
+                            </svg>
+                        )}
+                    </button>
+
+                    {/* Next Track */}
+                    <button className="player__btn player__btn--nav" onClick={nextTrack} title="Next Track">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                            <path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/>
+                        </svg>
+                    </button>
                 </div>
-                <span className="player__time">{formatTime(duration)}</span>
+
+                {/* Progress bar moved under controls for a wider, cleaner layout */}
+                <div className="player__progress-wrap">
+                    <span className="player__time">{formatTime(currentTime)}</span>
+                    <div
+                        className="player__progress"
+                        ref={progressRef}
+                        onClick={handleProgressClick}
+                    >
+                        <div className="player__progress-fill" style={{ width: `${progress}%` }} />
+                        <div className="player__progress-thumb" style={{ left: `${progress}%` }} />
+                    </div>
+                    <span className="player__time">{formatTime(duration)}</span>
+                </div>
             </div>
 
-            {/* Controls */}
-            <div className="player__controls">
-
+            {/* Volume & Extras */}
+            <div className="player__extras">
                 {/* Speed picker */}
                 <div className="player__speed-wrap">
                     <button
@@ -164,38 +198,6 @@ const Player = () => {
                         </div>
                     )}
                 </div>
-
-                {/* Backward 5s */}
-                <button className="player__btn player__btn--skip" onClick={() => skip(-5)} title="Back 5s">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
-                        <path d="M1 4v6h6"/>
-                        <path d="M3.51 15a9 9 0 1 0 .49-3.6"/>
-                    </svg>
-                    <span>5s</span>
-                </button>
-
-                {/* Play / Pause */}
-                <button className="player__btn player__btn--play" onClick={togglePlay} title={isPlaying ? 'Pause' : 'Play'}>
-                    {isPlaying ? (
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
-                            <rect x="6" y="4" width="4" height="16" rx="1"/>
-                            <rect x="14" y="4" width="4" height="16" rx="1"/>
-                        </svg>
-                    ) : (
-                        <svg viewBox="0 0 24 24" fill="currentColor" width="28" height="28">
-                            <path d="M8 5.14v14l11-7-11-7z"/>
-                        </svg>
-                    )}
-                </button>
-
-                {/* Forward 5s */}
-                <button className="player__btn player__btn--skip" onClick={() => skip(5)} title="Forward 5s">
-                    <span>5s</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
-                        <path d="M23 4v6h-6"/>
-                        <path d="M20.49 15a9 9 0 1 1-.49-3.6"/>
-                    </svg>
-                </button>
 
                 {/* Volume */}
                 <div className="player__volume">

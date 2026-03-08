@@ -1,22 +1,39 @@
 import React from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, Link } from 'react-router';
+import { useAuth } from '../../auth/hooks/useAuth'; // Ensure this path matches your project structure
 import './HomeLanding.scss';
 
 export default function HomeLanding() {
     const navigate = useNavigate();
+    
+    // Destructure the user state and logout function from your auth hook
+    const { user, handleLogout } = useAuth(); 
 
     const handleGetStarted = () => {
-        navigate('/register');
+        // If the user is already logged in, send them straight to the app
+        if (user) {
+            navigate('/app');
+        } else {
+            navigate('/register');
+        }
     };
 
     const handleLogin = () => {
         navigate('/login');
     };
 
+    const onLogoutClick = async () => {
+        try {
+            await handleLogout();
+        } catch (error) {
+            console.error("Logout failed", error);
+        }
+    };
+
     const scrollToSection = (sectionId) => {
         const element = document.getElementById(sectionId);
         if (element) {
-            const headerOffset = 80;
+            const headerOffset = 80; // Height of fixed nav
             const elementPosition = element.getBoundingClientRect().top;
             const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
@@ -32,20 +49,39 @@ export default function HomeLanding() {
             {/* Navigation */}
             <nav className="nav">
                 <div className="nav__container">
-                    <div className="nav__logo">
-                        <span className="nav__logo-text">MoodBeats</span>
-                        <div className="nav__logo-accent"></div>
-                    </div>
+                    {/* Logo wrapped in a Link to always return to the landing page */}
+                    <Link to="/" style={{ textDecoration: 'none' }}>
+                        <div className="nav__logo">
+                            <span className="nav__logo-text">Moodify</span>
+                            <div className="nav__logo-accent"></div>
+                        </div>
+                    </Link>
+
                     <div className="nav__links">
                         <button className="nav__link" onClick={() => scrollToSection('features')}>Features</button>
                         <button className="nav__link" onClick={() => scrollToSection('how-it-works')}>How it Works</button>
                         <button className="nav__link" onClick={() => scrollToSection('demo')}>Demo</button>
-                        <button className="nav__button nav__button--secondary" onClick={handleLogin}>
-                            Sign In
-                        </button>
-                        <button className="nav__button nav__button--primary" onClick={handleGetStarted}>
-                            Get Started
-                        </button>
+                        
+                        {/* Conditional Rendering based on Authentication Status */}
+                        {user ? (
+                            <>
+                                <button className="nav__button nav__button--secondary" onClick={onLogoutClick}>
+                                    Logout
+                                </button>
+                                <button className="nav__button nav__button--primary" onClick={() => navigate('/app')}>
+                                    Go to Player
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                <button className="nav__button nav__button--secondary" onClick={handleLogin}>
+                                    Sign In
+                                </button>
+                                <button className="nav__button nav__button--primary" onClick={handleGetStarted}>
+                                    Get Started
+                                </button>
+                            </>
+                        )}
                     </div>
                 </div>
             </nav>
@@ -76,7 +112,7 @@ export default function HomeLanding() {
                         
                         <div className="hero__actions">
                             <button className="btn btn--primary" onClick={handleGetStarted}>
-                                Try Mood Detection
+                                {user ? 'Launch Dashboard' : 'Try Mood Detection'}
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                     <path d="M5 12h14M12 5l7 7-7 7"/>
                                 </svg>
@@ -275,7 +311,7 @@ export default function HomeLanding() {
                     <div className="demo__content">
                         <h2 className="demo__title">See It In Action</h2>
                         <p className="demo__description">
-                            Watch how MoodBeats transforms facial expressions into personalized music experiences
+                            Watch how Moodify transforms facial expressions into personalized music experiences
                         </p>
                         <div className="demo__video">
                             <div className="video-placeholder">
@@ -303,11 +339,15 @@ export default function HomeLanding() {
                         </p>
                         <div className="cta__actions">
                             <button className="cta__button cta__button--primary" onClick={handleGetStarted}>
-                                Start Your Musical Journey
+                                {user ? 'Go to Application' : 'Start Your Musical Journey'}
                             </button>
-                            <button className="cta__button cta__button--secondary" onClick={handleLogin}>
-                                Sign In to Account
-                            </button>
+                            
+                            {/* Hide Sign In button here if the user is already logged in */}
+                            {!user && (
+                                <button className="cta__button cta__button--secondary" onClick={handleLogin}>
+                                    Sign In to Account
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -318,7 +358,7 @@ export default function HomeLanding() {
                 <div className="footer__container">
                     <div className="footer__content">
                         <div className="footer__brand">
-                            <span className="footer__logo">MoodBeats</span>
+                            <span className="footer__logo">Moodify</span>
                             <p className="footer__tagline">Where AI meets emotion through music</p>
                         </div>
                         <div className="footer__links">
@@ -343,7 +383,7 @@ export default function HomeLanding() {
                         </div>
                     </div>
                     <div className="footer__bottom">
-                        <p>&copy; 2024 MoodBeats. All rights reserved. Built with ❤️ using React.</p>
+                        <p>&copy; 2024 Moodify. All rights reserved. Built with ❤️ using React.</p>
                     </div>
                 </div>
             </footer>
