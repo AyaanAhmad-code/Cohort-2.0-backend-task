@@ -13,12 +13,11 @@ const formatTime = (seconds) => {
 
 const Player = () => {
     // Destructured nextTrack and prevTrack for playlist navigation
-    const { song, nextTrack, prevTrack } = useSong()
+    const { song, nextTrack, prevTrack, isPlaying, setIsPlaying } = useSong()
 
     const audioRef = useRef(null)
     const progressRef = useRef(null)
 
-    const [isPlaying, setIsPlaying] = useState(false)
     const [currentTime, setCurrentTime] = useState(0)
     const [duration, setDuration] = useState(0)
     const [speed, setSpeed] = useState(1)
@@ -26,19 +25,28 @@ const Player = () => {
     const [showSpeed, setShowSpeed] = useState(false)
     const [isMuted, setIsMuted] = useState(false)
 
+    // Inside Player.jsx
+    
     // Reset player when song changes
     useEffect(() => {
-        if (audioRef.current) {
-            audioRef.current.load()
+        if (audioRef.current && song?.url) {
+            audioRef.current.pause(); // Pause any currently playing audio
+            audioRef.current.src = song.url; // Force the new source
+            audioRef.current.load();
             
-            // Auto-play when a new song is loaded from the playlist
+            // Auto-play when a new song is loaded
             const playPromise = audioRef.current.play();
             if (playPromise !== undefined) {
-                playPromise.then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+                playPromise
+                    .then(() => setIsPlaying(true))
+                    .catch((error) => {
+                        console.log("Audio play interrupted/loading:", error);
+                        setIsPlaying(false); // Fails safely without crashing
+                    });
             }
-            setCurrentTime(0)
+            setCurrentTime(0);
         }
-    }, [song?.url])
+    }, [song?.url]);
 
     const togglePlay = () => {
         const audio = audioRef.current
@@ -48,7 +56,6 @@ const Player = () => {
         } else {
             audio.play()
         }
-        setIsPlaying(!isPlaying)
     }
 
     const handleTimeUpdate = () => {
@@ -111,6 +118,8 @@ const Player = () => {
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleLoadedMetadata}
                 onEnded={handleSongEnd}
+                onPlay={() => setIsPlaying(true)} 
+                onPause={() => setIsPlaying(false)}
             />
 
             {/* Poster + Info */}

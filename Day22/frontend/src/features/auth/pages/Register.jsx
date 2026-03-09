@@ -87,9 +87,10 @@ const Register = () => {
                     
                     <button 
                         className="button" 
-                        type="submit" // Prevent multiple submissions
+                        type="submit"
+                        disabled={loading} // Prevent multiple submissions
                     >
-                        Register
+                        {loading ? "Creating Account..." : "Register"}
                     </button>
                 </form>
                 

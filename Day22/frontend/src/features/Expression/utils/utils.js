@@ -25,7 +25,6 @@ export const init = async ({landmarkerRef,videoRef,streamRef}) => {
         videoRef.current.srcObject = streamRef.current;
         await videoRef.current.play();
 
-        detect();
     };
 
 export const detect = ({landmarkerRef,videoRef,setExpression}) => {
@@ -48,8 +47,6 @@ export const detect = ({landmarkerRef,videoRef,setExpression}) => {
             const browUp = getScore("browInnerUp");
             const frownLeft = getScore("mouthFrownLeft");
             const frownRight = getScore("mouthFrownRight");
-
-            console.log(getScore("mouthFrownLeft"))
 
             let currentExpression = "neutral";
 

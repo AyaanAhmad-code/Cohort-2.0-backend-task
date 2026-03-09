@@ -5,43 +5,53 @@ import { songContext } from "../song.context"
 export const useSong = ()=>{
     const context = useContext(songContext)
 
-    const {loading,setLoading,song,setSong, songsList, setSongsList} = context
+    const {loading,setLoading,song,setSong, songsList, setSongsList, 
+            isPlaying, setIsPlaying} = context
 
     async function handleSong({ mood }) {
         setLoading(true);
         try {
-            // Fetch from your Express backend
             const data = await getSong({ mood });
             
-            // Extract the array of songs safely
             let fetchedSongs = [];
+            
+            // Extract the songs array
             if (Array.isArray(data)) {
                 fetchedSongs = data;
-            } else if (data.songs && Array.isArray(data.songs)) {
-                fetchedSongs = data.songs; // In case backend returns { songs: [...] }
-            } else if (data.song && Array.isArray(data.song)) {
-                fetchedSongs = data.song; // In case backend returns { song: [...] }
+            } else if (data?.songs && Array.isArray(data.songs)) {
+                fetchedSongs = data.songs; 
+            } else if (data?.song && Array.isArray(data.song)) {
+                fetchedSongs = data.song; 
+            } else if (data?.data && Array.isArray(data.data)) {
+                fetchedSongs = data.data;
+            } else if (data?.song) {
+                fetchedSongs = [data.song]; 
+            } else if (data && typeof data === 'object') {
+                fetchedSongs = [data];
             }
 
             if (fetchedSongs.length > 0) {
-                setSongsList(fetchedSongs); // Put all songs in the right-hand list
-                setSong(fetchedSongs[0]);   // Auto-play the first one
+                setSongsList(fetchedSongs); 
+                
+                const randomIndex = Math.floor(Math.random() * fetchedSongs.length);
+                setSong(fetchedSongs[randomIndex]); 
+
             } else {
                 setSongsList([]);
                 setSong(null);
             }
         } catch (error) {
             console.error("Error fetching songs:", error);
+            setSongsList([]);
+            setSong(null);
         } finally {
             setLoading(false);
         }
     }
 
-    // Function to run when a user clicks a song in the list
     const playSpecificSong = (clickedSong) => {
         setSong(clickedSong);
     };
 
-    // Return exactly what the UI needs, nothing more.
-    return { loading, song, songsList, handleSong, playSpecificSong };
+    return { loading, song, songsList, handleSong, playSpecificSong, isPlaying, setIsPlaying };
 }

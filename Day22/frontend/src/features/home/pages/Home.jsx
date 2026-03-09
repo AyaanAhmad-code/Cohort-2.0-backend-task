@@ -8,7 +8,7 @@ import './Home.scss';
 
 const Home = () => {
     // 1. Pull the pure, simplified data from your hook
-    const { song, songsList, handleSong, playSpecificSong } = useSong();
+    const { song, songsList, handleSong, playSpecificSong, isPlaying } = useSong();
     
     const { user, handleLogout } = useAuth(); 
     const navigate = useNavigate();
@@ -38,6 +38,18 @@ const Home = () => {
         await handleLogout();
         navigate('/'); 
     };
+
+    const getVibeData = (mood) => {
+        const vibes = {
+            happy: { text: "High energy, major scales, and driving rhythms to boost your serotonin.", color: "#ff6b00", glow: "rgba(255, 107, 0, 0.4)" },
+            sad: { text: "Slower tempos and minor keys to provide comfort and emotional reflection.", color: "#00e5ff", glow: "rgba(0, 229, 255, 0.4)" }, // Blue for sad
+            neutral: { text: "Balanced frequencies and steady beats to maintain your focus and clarity.", color: "#4ADE80", glow: "rgba(74, 222, 128, 0.4)" }, // Green for neutral
+            surprised: { text: "Dynamic shifts and energetic drops to match your elevated state.", color: "#ff00ff", glow: "rgba(255, 0, 255, 0.4)" } // Pink for surprised
+        };
+        return vibes[mood?.toLowerCase()] || vibes.neutral;
+    };
+
+    const currentVibe = getVibeData(activeMood);
 
     return (
         <div className="dashboard-wrapper">
@@ -82,23 +94,47 @@ const Home = () => {
                         </div>
                     </div>
 
-                    <div className="glass-card mood-history-card">
-                        <div className="history-header">
+                    {/* Middle: Vibe Sync Visualizer (Replaced Mood History) */}
+                    <div className="glass-card vibe-sync-card">
+                        <div className="vibe-header">
                             <div>
-                                <span className="label">MOOD HISTORY</span>
-                                <h3>Today's Timeline</h3>
+                                <span className="label">AI ACOUSTIC INSIGHT</span>
+                                <h3>Vibe Synchronization</h3>
                             </div>
-                            <div className="live-indicator"><span className="dot"></span> LIVE</div>
+                            {/* 🔥 DEBUGGER UI: This proves if React state is working */}
+                            <div className="live-indicator">
+                                <span 
+                                    className="dot" 
+                                    style={{ backgroundColor: currentVibe.color, boxShadow: `0 0 10px ${currentVibe.color}` }}
+                                ></span> 
+                                {isPlaying ? "SYNCED" : "STANDBY"}
+                            </div>
                         </div>
-                        <div className="history-tabs">
-                            <button className={`tab-btn ${historyTab === 'today' ? 'active' : ''}`} onClick={() => setHistoryTab('today')}>TODAY</button>
-                            <button className={`tab-btn ${historyTab === '7days' ? 'active' : ''}`} onClick={() => setHistoryTab('7days')}>7 DAYS</button>
-                        </div>
-                        <div className="history-list">
-                            <div className="history-item">
-                                <div className="history-indicator" style={{ backgroundColor: moodColor }}></div>
-                                <span className="history-mood">Happy</span>
-                                <span className="history-time">03:21 AM</span>
+
+                        <div className="vibe-content">
+                            <div className="vibe-visualizer">
+                                {/* 🔥 Forced strictly evaluated class names */}
+                                <div 
+                                    className={isPlaying ? "pulsing-orb active" : "pulsing-orb"} 
+                                    style={{
+                                        background: `radial-gradient(circle, ${currentVibe.color} 0%, transparent 70%)`,
+                                        boxShadow: `0 0 40px ${currentVibe.glow}`
+                                    }}
+                                ></div>
+                                <div className="wave-bars">
+                                    {[...Array(12)].map((_, i) => (
+                                        <div 
+                                            key={i} 
+                                            className={isPlaying ? "bar playing" : "bar"} 
+                                            style={{ backgroundColor: currentVibe.color }}
+                                        ></div>
+                                    ))}
+                                </div>
+                            </div>
+                            
+                            <div className="vibe-text">
+                                <h3 style={{ color: currentVibe.color }}>{activeMood} Energy</h3>
+                                <p>{currentVibe.text}</p>
                             </div>
                         </div>
                     </div>
@@ -112,7 +148,7 @@ const Home = () => {
                 <aside className="col-right">
                     <div className="glass-card playlist-card">
                         <div className="card-header">
-                            <h3>✨ AI Recommended for you</h3>
+                            <h3>AI Recommended for you</h3>
                         </div>
                         
                         <div className="search-box">
@@ -143,6 +179,11 @@ const Home = () => {
                                             <h4>{track.title}</h4>
                                             <p>{track.artist || 'Unknown Artist'}</p>
                                         </div>
+                                        {(song?._id === track._id || song?.url === track.url) && (
+                                            <div className="playing-bars">
+                                                <span></span><span></span><span></span>
+                                            </div>
+                                        )}
                                     </div>
                                 ))
                             ) : (

@@ -36,16 +36,18 @@ async function uploadSong(req, res) {
 
 async function getSong(req,res){
 
-    const {mood} = req.query;
+    const { mood } = req.query;
 
-    const song = await songModel.findOne({
-        mood
-    }) //how to add random implementing to be
+    try {
+        const songs = await songModel.find({ mood }); 
 
-    res.status(200).json({
-        message:"song feteched successully",
-        song
-    })
+        res.status(200).json({
+            message: "songs fetched successfully",
+            songs
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching songs", error });
+    }
 
 }
 
