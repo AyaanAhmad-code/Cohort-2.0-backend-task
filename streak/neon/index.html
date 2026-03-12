@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Gravity Playground</title>
+
+<style>
+
+body{
+margin:0;
+overflow:hidden;
+background:#020617;
+font-family:sans-serif;
+}
+
+canvas{
+display:block;
+}
+
+.info{
+position:absolute;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+color:white;
+text-align:center;
+opacity:.9;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="info">
+<h2>Gravity Playground</h2>
+<p>Move your mouse — it becomes a gravity source</p>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+
+const canvas = document.getElementById("canvas")
+const ctx = canvas.getContext("2d")
+
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+const mouse = {
+x:canvas.width/2,
+y:canvas.height/2
+}
+
+window.addEventListener("mousemove",(e)=>{
+mouse.x = e.clientX
+mouse.y = e.clientY
+})
+
+class Ball{
+
+constructor(){
+
+this.x = Math.random()*canvas.width
+this.y = Math.random()*canvas.height
+
+this.vx = (Math.random()-0.5)*2
+this.vy = (Math.random()-0.5)*2
+
+this.radius = Math.random()*4 + 2
+
+this.color = `hsl(${Math.random()*360},80%,60%)`
+
+}
+
+draw(){
+
+ctx.beginPath()
+ctx.arc(this.x,this.y,this.radius,0,Math.PI*2)
+ctx.fillStyle = this.color
+ctx.fill()
+
+}
+
+update(){
+
+let dx = mouse.x - this.x
+let dy = mouse.y - this.y
+
+let distance = Math.sqrt(dx*dx + dy*dy)
+
+let force = 100 / distance
+
+this.vx += dx * force * 0.0001
+this.vy += dy * force * 0.0001
+
+this.x += this.vx
+this.y += this.vy
+
+this.draw()
+
+}
+
+}
+
+let balls = []
+
+function init(){
+
+balls = []
+
+for(let i=0;i<300;i++){
+
+balls.push(new Ball())
+
+}
+
+}
+
+function animate(){
+
+ctx.fillStyle = "rgba(2,6,23,0.25)"
+ctx.fillRect(0,0,canvas.width,canvas.height)
+
+balls.forEach(ball=>ball.update())
+
+requestAnimationFrame(animate)
+
+}
+
+init()
+animate()
+
+</script>
+
+</body>
+</html>
