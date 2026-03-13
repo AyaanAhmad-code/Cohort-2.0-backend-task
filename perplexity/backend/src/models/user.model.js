@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
+    lastEmailSent: {
+        type: Date,
+        default: null
+    },
 },{
     timestamps:true
 })

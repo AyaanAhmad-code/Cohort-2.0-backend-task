@@ -9,7 +9,6 @@ import "dotenv/config"
  * @access Public
  * @body { username, email, password }
  */
-
 export async function register(req,res){
 
     const {username,email,password} = req.body;
@@ -163,6 +162,15 @@ export async function verifyEmail(req,res){
             })
         }
 
+        if(user.verified){
+            const html = `
+            <h1>Your email is already verified</h1>
+            <P>You can proceed to login.</P>
+            <a href="http://localhost:3000/login">Go to Login</a>
+            `
+            return res.send(html)
+        }
+
         user.verified = true;
 
         await user.save();
@@ -181,5 +189,76 @@ export async function verifyEmail(req,res){
             success: false,
             err: err.message
         })
+    }
+}
+
+/**
+ * @desc    Resend verification email to a user
+ * @route   POST /api/auth/resend-verification
+ * @access  Public
+ * @body    { email }
+ */
+export async function resendEmail(req, res) {
+    const { email } = req.body;
+
+    try {
+        const user = await userModel.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        if (user.verified) {
+            return res.status(400).json({
+                success: false,
+                message: "This account is already verified. Please log in"
+            });
+        }
+
+        const COOLDOWN_TIME = 60 * 1000;
+        const currentTime = Date.now();
+
+        if (user.lastEmailSent && (currentTime - user.lastEmailSent < COOLDOWN_TIME)) {
+            const timeLeft = Math.ceil((COOLDOWN_TIME - (currentTime - user.lastEmailSent)) / 1000);
+            return res.status(429).json({
+                success: false,
+                message: `Please wait ${timeLeft} seconds before requesting another email.`
+            });
+        }
+
+        const emailVerificationToken = jwt.sign(
+            { email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        await sendEmail({
+            to: email,
+            subject: "Verify your email - Perplexity",
+            html: `
+                <p>Hi ${user.username},</p>
+                <p>Click the link below to verify your email:</p>
+                <a href="http://localhost:3000/api/auth/verify-email?token=${emailVerificationToken}">Verify Email</a>
+                <p>This link expires in 1 hour.</p>
+            `
+        });
+
+        user.lastEmailSent = currentTime;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: "Verification email sent successfully"
+        });
+
+    } catch (error) {
+        res.status(400).json({
+            message: "Invalid or expired token",
+            success: false,
+            err: err.message
+        });
     }
 }
