@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>DNA Skill Network</title>
+
+<style>
+
+body{
+margin:0;
+overflow:hidden;
+background:#020617;
+font-family:system-ui;
+}
+
+canvas{
+position:absolute;
+top:0;
+left:0;
+}
+
+.card{
+position:absolute;
+width:140px;
+height:65px;
+
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.1);
+border-radius:14px;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+color:white;
+backdrop-filter:blur(10px);
+transition:.4s;
+}
+
+.card.active{
+transform:scale(1.15);
+box-shadow:0 0 25px #60a5fa;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="card" style="top:20%;left:20%">Frontend</div>
+<div class="card" style="top:40%;left:75%">Backend</div>
+<div class="card" style="top:70%;left:35%">AI</div>
+<div class="card" style="top:65%;left:70%">DSA</div>
+<div class="card" style="top:35%;left:50%">Projects</div>
+
+<script>
+
+const canvas = document.getElementById("canvas")
+const ctx = canvas.getContext("2d")
+
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+window.addEventListener("resize",()=>{
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+})
+
+let mouse={x:null,y:null}
+
+document.addEventListener("mousemove",(e)=>{
+mouse.x=e.clientX
+mouse.y=e.clientY
+})
+
+document.addEventListener("mouseleave",()=>{
+mouse.x=null
+mouse.y=null
+})
+
+const cards=document.querySelectorAll(".card")
+
+function getCardCenters(){
+
+return Array.from(cards).map(card=>{
+
+const rect=card.getBoundingClientRect()
+
+return{
+x:rect.left+rect.width/2,
+y:rect.top+rect.height/2
+}
+
+})
+
+}
+
+const nodes=[]
+const NODE_COUNT=100
+let time=0
+
+class Node{
+
+constructor(i){
+
+this.index=i
+this.x=Math.random()*canvas.width
+this.y=Math.random()*canvas.height
+
+this.vx=0
+this.vy=0
+
+}
+
+update(){
+
+const centers=getCardCenters()
+
+const group=Math.floor(this.index/(NODE_COUNT/centers.length))
+const target=centers[group%centers.length]
+
+const angle=this.index*0.4+time
+const radius=60
+
+const targetX=target.x+Math.cos(angle)*radius
+const targetY=target.y+Math.sin(angle)*radius
+
+if(mouse.x!==null){
+
+let dx=mouse.x-this.x
+let dy=mouse.y-this.y
+let dist=Math.sqrt(dx*dx+dy*dy)
+
+if(dist<200){
+
+this.vx+=dx*0.0009
+this.vy+=dy*0.0009
+
+}
+
+}else{
+
+this.vx+=(targetX-this.x)*0.02
+this.vy+=(targetY-this.y)*0.02
+
+}
+
+this.x+=this.vx
+this.y+=this.vy
+
+this.vx*=0.9
+this.vy*=0.9
+
+}
+
+draw(){
+
+ctx.beginPath()
+ctx.arc(this.x,this.y,3,0,Math.PI*2)
+ctx.fillStyle="#60a5fa"
+ctx.fill()
+
+}
+
+}
+
+for(let i=0;i<NODE_COUNT;i++){
+nodes.push(new Node(i))
+}
+
+/* click burst */
+
+canvas.addEventListener("click",(e)=>{
+
+nodes.forEach(n=>{
+
+let dx=n.x-e.clientX
+let dy=n.y-e.clientY
+let dist=Math.sqrt(dx*dx+dy*dy)
+
+if(dist<120){
+
+n.vx+=dx*0.05
+n.vy+=dy*0.05
+
+}
+
+})
+
+})
+
+function drawConnections(){
+
+for(let i=0;i<nodes.length;i++){
+
+for(let j=i+1;j<nodes.length;j++){
+
+let dx=nodes[i].x-nodes[j].x
+let dy=nodes[i].y-nodes[j].y
+
+let dist=Math.sqrt(dx*dx+dy*dy)
+
+if(dist<600){
+
+ctx.beginPath()
+ctx.moveTo(nodes[i].x,nodes[i].y)
+ctx.lineTo(nodes[j].x,nodes[j].y)
+
+ctx.strokeStyle=`rgba(96,165,250,${1-dist/400})`
+ctx.stroke()
+
+}
+
+}
+
+}
+
+}
+
+function drawCardConnections(){
+
+const centers = getCardCenters()
+
+const links = [
+[0,4], // Frontend → Projects
+[4,1], // Projects → Backend
+[1,3], // Backend → DSA
+[3,2], // DSA → AI
+[2,4]  // AI → Projects
+]
+
+links.forEach(link=>{
+
+const a = centers[link[0]]
+const b = centers[link[1]]
+
+ctx.beginPath()
+ctx.moveTo(a.x,a.y)
+ctx.lineTo(b.x,b.y)
+
+ctx.strokeStyle="rgba(96,165,250,0.6)"
+ctx.lineWidth=2
+ctx.stroke()
+
+})
+
+}
+
+function animate(){
+
+time+=0.02
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+drawCardConnections()
+drawConnections()
+
+nodes.forEach(n=>{
+n.update()
+n.draw()
+})
+
+/* card glow */
+
+cards.forEach(card=>{
+
+const rect=card.getBoundingClientRect()
+const cx=rect.left+rect.width/2
+const cy=rect.top+rect.height/2
+
+let active=false
+
+nodes.forEach(n=>{
+
+let dx=n.x-cx
+let dy=n.y-cy
+let dist=Math.sqrt(dx*dx+dy*dy)
+
+if(dist<80){
+active=true
+}
+
+})
+
+card.classList.toggle("active",active)
+
+})
+
+requestAnimationFrame(animate)
+
+}
+
+animate()
+
+</script>
+
+</body>
+</html>
