@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Developer Brain</title>
+
+<style>
+
+body{
+margin:0;
+overflow:hidden;
+font-family:Arial, Helvetica, sans-serif;
+background:#020617;
+color:white;
+}
+
+/* TECH GRID */
+
+body::before{
+content:"";
+position:absolute;
+width:100%;
+height:100%;
+background-image:
+linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+background-size:60px 60px;
+z-index:-2;
+}
+
+/* AURORA BACKGROUND */
+
+.background{
+position:absolute;
+width:100%;
+height:100%;
+overflow:hidden;
+z-index:-3;
+}
+
+.blob{
+position:absolute;
+width:600px;
+height:600px;
+border-radius:50%;
+filter:blur(160px);
+opacity:0.5;
+animation:float 20s infinite ease-in-out;
+}
+
+.blob1{
+background:#38bdf8;
+top:-200px;
+left:-200px;
+}
+
+.blob2{
+background:#9333ea;
+bottom:-200px;
+right:-150px;
+animation-delay:6s;
+}
+
+.blob3{
+background:#f472b6;
+top:40%;
+left:40%;
+animation-delay:12s;
+}
+
+@keyframes float{
+
+0%{
+transform:translate(0,0) scale(1);
+}
+
+50%{
+transform:translate(200px,-100px) scale(1.2);
+}
+
+100%{
+transform:translate(0,0) scale(1);
+}
+
+}
+
+/* TITLE */
+
+.title{
+position:absolute;
+top:40px;
+left:50%;
+transform:translateX(-50%);
+font-size:40px;
+font-weight:800;
+letter-spacing:3px;
+text-shadow:0 0 20px #38bdf8;
+}
+
+/* WORDS */
+
+.word{
+position:absolute;
+font-weight:700;
+font-size:20px;
+color:#38bdf8;
+text-shadow:
+0 0 5px #38bdf8,
+0 0 10px #38bdf8,
+0 0 20px #0ea5e9;
+cursor:pointer;
+user-select:none;
+}
+
+.letter{
+display:inline-block;
+transition:transform .4s ease,color .3s;
+}
+
+/* CANVAS */
+
+canvas{
+position:absolute;
+top:0;
+left:0;
+z-index:0;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="background">
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+</div>
+
+<div class="title">Developer Brain</div>
+
+<canvas id="c"></canvas>
+
+<script>
+
+const tech = [
+"HTML","CSS","JavaScript","React","Node",
+"Redux","Git","API","DSA","AI",
+"TypeScript","MongoDB","NextJS",
+"GraphQL","Docker","WebGL"
+]
+
+const canvas = document.getElementById("c")
+const ctx = canvas.getContext("2d")
+
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+let words=[]
+
+tech.forEach(t=>{
+
+const el = document.createElement("div")
+el.className="word"
+
+t.split("").forEach(l=>{
+const span=document.createElement("span")
+span.className="letter"
+span.innerText=l
+el.appendChild(span)
+})
+
+document.body.appendChild(el)
+
+let obj={
+el,
+letters:el.querySelectorAll(".letter"),
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+vx:(Math.random()-0.5)*1.5,
+vy:(Math.random()-0.5)*1.5
+}
+
+words.push(obj)
+
+el.addEventListener("mouseenter",()=>shatter(obj))
+
+})
+
+let mouse={x:0,y:0}
+
+document.addEventListener("mousemove",e=>{
+mouse.x=e.clientX
+mouse.y=e.clientY
+})
+
+function shatter(word){
+
+word.letters.forEach(letter=>{
+
+let x=(Math.random()-0.5)*80
+let y=(Math.random()-0.5)*80
+let r=(Math.random()-0.5)*360
+
+letter.style.transform=`translate(${x}px,${y}px) rotate(${r}deg)`
+letter.style.color="#f472b6"
+
+setTimeout(()=>{
+letter.style.transform="translate(0,0) rotate(0)"
+letter.style.color="#38bdf8"
+},400)
+
+})
+
+}
+
+function update(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+words.forEach(w=>{
+
+w.x+=w.vx
+w.y+=w.vy
+
+if(w.x<0||w.x>canvas.width) w.vx*=-1
+if(w.y<0||w.y>canvas.height) w.vy*=-1
+
+let dx=mouse.x-w.x
+let dy=mouse.y-w.y
+let dist=Math.sqrt(dx*dx+dy*dy)
+
+if(dist<180){
+w.x-=dx*0.01
+w.y-=dy*0.01
+}
+
+w.el.style.transform=`translate(${w.x}px,${w.y}px)`
+
+})
+
+for(let i=0;i<words.length;i++){
+for(let j=i;j<words.length;j++){
+
+let dx=words[i].x-words[j].x
+let dy=words[i].y-words[j].y
+let dist=Math.sqrt(dx*dx+dy*dy)
+
+if(dist<150){
+
+ctx.beginPath()
+ctx.moveTo(words[i].x,words[i].y)
+ctx.lineTo(words[j].x,words[j].y)
+ctx.strokeStyle="rgba(56,189,248,0.15)"
+ctx.lineWidth=1
+ctx.stroke()
+
+}
+
+}
+}
+
+requestAnimationFrame(update)
+
+}
+
+update()
+
+window.addEventListener("resize",()=>{
+canvas.width=window.innerWidth
+canvas.height=window.innerHeight
+})
+
+</script>
+
+</body>
+</html>
+

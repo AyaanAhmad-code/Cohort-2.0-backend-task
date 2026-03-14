@@ -4,6 +4,7 @@ import { ChatMistralAI } from "@langchain/mistralai";
 import { createAgent, HumanMessage, tool } from "langchain";
 import { sendEmail } from "./mail.service.js";
 import * as z from "zod"
+import { searchInternet } from "./search.service.js";
 
 
 const emailTool = tool(
@@ -19,6 +20,17 @@ const emailTool = tool(
     }
 )
 
+const searchTool = tool(
+    searchInternet,
+    {
+        name: "searchTool",
+        description: "Use this tool to fetch real-time information from the internet about current events, news, or facts not in your training data.",
+        schema: z.object({
+            query: z.string().describe("The specific search terms or question to look up on the internet.")
+        })
+    }
+)
+
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -30,7 +42,8 @@ const model = new ChatMistralAI({
 
 const agent = createAgent({
     model,
-    tools: [ emailTool ]
+    tools: [ emailTool, searchTool ],
+    systemMessage: "You are a helpful assistant with access to the internet and email. Always use the search tool for current events. If the user asks to send an email, confirm the details first."
 })
 
 const messages = []
@@ -45,7 +58,8 @@ while(true){
 
     messages.push(response.messages[response.messages.length -1])
 
-    console.log(response.messages[response.messages.length -1])
+    const finalContent = response.messages[response.messages.length - 1].content;
+    console.log(`\n\x1b[34mAI:\x1b[0m ${finalContent}\n`);
 
 }
 

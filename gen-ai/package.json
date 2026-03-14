@@ -12,6 +12,7 @@
   "description": "",
   "dependencies": {
     "@langchain/mistralai": "^1.0.7",
+    "@tavily/core": "^0.7.2",
     "dotenv": "^17.3.1",
     "langchain": "^1.2.31",
     "nodemailer": "^8.0.2",
