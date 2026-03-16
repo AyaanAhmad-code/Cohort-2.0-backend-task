@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Galaxy Particle Typography</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+overflow:hidden;
+background:radial-gradient(circle at center,#020617,#000);
+font-family:Inter, sans-serif;
+color:white;
+}
+
+/* CANVAS */
+
+canvas{
+display:block;
+}
+
+/* CONTROL PANEL */
+
+.controls{
+
+position:fixed;
+bottom:40px;
+left:50%;
+transform:translateX(-50%);
+
+padding:16px 26px;
+border-radius:18px;
+
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(20px);
+
+box-shadow:
+0 10px 40px rgba(0,0,0,.5),
+inset 0 0 20px rgba(255,255,255,.08);
+
+display:flex;
+gap:12px;
+align-items:center;
+
+}
+
+/* INPUT */
+
+.controls input{
+
+background:transparent;
+border:none;
+outline:none;
+
+color:white;
+font-size:18px;
+
+padding:8px 10px;
+
+border-bottom:1px solid rgba(255,255,255,.3);
+
+width:300px;
+
+text-align:left;
+
+}
+
+.controls input:focus{
+
+border-bottom:1px solid #7c9cff;
+
+box-shadow:
+0 6px 20px rgba(124,156,255,.3);
+
+}
+
+.controls label{
+
+opacity:.7;
+font-size:14px;
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="controls">
+
+<label>Type</label>
+<input id="textInput" value="CREATIVE CODING">
+
+</div>
+
+<canvas id="canvas"></canvas>
+
+<script>
+
+const canvas=document.getElementById("canvas")
+const ctx=canvas.getContext("2d")
+
+canvas.width=window.innerWidth
+canvas.height=window.innerHeight
+
+let particles=[]
+
+let mouse={x:0,y:0}
+
+window.addEventListener("mousemove",e=>{
+mouse.x=e.x
+mouse.y=e.y
+})
+
+class Particle{
+
+constructor(x,y){
+
+this.x=Math.random()*canvas.width
+this.y=Math.random()*canvas.height
+
+this.baseX=x
+this.baseY=y
+
+this.vx=0
+this.vy=0
+
+this.size=2
+
+this.colorHue=Math.random()*360
+
+}
+
+update(){
+
+let dx=this.x-mouse.x
+let dy=this.y-mouse.y
+
+let dist=Math.sqrt(dx*dx+dy*dy)
+
+if(dist<140){
+
+let force=(140-dist)/140
+
+this.vx+=dx*force*0.03
+this.vy+=dy*force*0.03
+
+}
+
+this.vx+=(this.baseX-this.x)*0.015
+this.vy+=(this.baseY-this.y)*0.015
+
+this.vx*=0.92
+this.vy*=0.92
+
+this.x+=this.vx
+this.y+=this.vy
+
+}
+
+draw(){
+
+let gradient=ctx.createRadialGradient(
+this.x,this.y,0,
+this.x,this.y,6
+)
+
+gradient.addColorStop(0,`hsl(${this.colorHue},100%,70%)`)
+gradient.addColorStop(1,"transparent")
+
+ctx.fillStyle=gradient
+
+ctx.beginPath()
+ctx.arc(this.x,this.y,this.size,0,Math.PI*2)
+ctx.fill()
+
+}
+
+}
+
+function createText(text){
+
+particles=[]
+
+const off=document.createElement("canvas")
+const offCtx=off.getContext("2d")
+
+off.width=canvas.width
+off.height=canvas.height
+
+let maxWidth=canvas.width*0.8
+
+let words=text.split(" ")
+
+let lines=[]
+let current=""
+
+offCtx.font="bold 140px sans-serif"
+
+words.forEach(word=>{
+
+let test=current+word+" "
+
+let width=offCtx.measureText(test).width
+
+if(width>maxWidth){
+
+lines.push(current)
+current=word+" "
+
+}else{
+
+current=test
+
+}
+
+})
+
+lines.push(current)
+
+let lineHeight=160
+let startY=canvas.height/2-(lines.length*lineHeight)/2
+
+offCtx.fillStyle="white"
+offCtx.textAlign="center"
+
+lines.forEach((line,i)=>{
+
+offCtx.fillText(
+line,
+canvas.width/2,
+startY+i*lineHeight
+)
+
+})
+
+const data=offCtx.getImageData(0,0,canvas.width,canvas.height)
+
+for(let y=0;y<canvas.height;y+=6){
+
+for(let x=0;x<canvas.width;x+=6){
+
+let index=(y*canvas.width+x)*4
+
+if(data.data[index+3]>150){
+
+particles.push(new Particle(x,y))
+
+}
+
+}
+
+}
+
+}
+
+createText("CREATIVE CODING")
+
+const input=document.getElementById("textInput")
+
+input.addEventListener("input",()=>{
+createText(input.value)
+})
+
+function connectParticles(){
+
+for(let a=0;a<particles.length;a++){
+
+for(let b=a;b<particles.length;b++){
+
+let dx=particles[a].x-particles[b].x
+let dy=particles[a].y-particles[b].y
+
+let dist=Math.sqrt(dx*dx+dy*dy)
+
+if(dist<30){
+
+ctx.strokeStyle="rgba(120,150,255,0.08)"
+
+ctx.beginPath()
+ctx.moveTo(particles[a].x,particles[a].y)
+ctx.lineTo(particles[b].x,particles[b].y)
+ctx.stroke()
+
+}
+
+}
+
+}
+
+}
+
+function animate(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height)
+
+particles.forEach(p=>{
+p.update()
+p.draw()
+})
+
+connectParticles()
+
+requestAnimationFrame(animate)
+
+}
+
+animate()
+
+</script>
+
+</body>
+</html>
+
