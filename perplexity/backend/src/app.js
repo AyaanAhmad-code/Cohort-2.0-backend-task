@@ -4,7 +4,6 @@ import authRouter from "./routes/auth.routes.js"
 import chatRouter from "./routes/chat.routes.js";
 import cors from "cors"
 import morgan from "morgan"
-import { get } from "mongoose";
 
 const app = express();
 

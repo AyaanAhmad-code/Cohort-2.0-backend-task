@@ -1,6 +1,19 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { HumanMessage, SystemMessage, AIMessage } from "langchain"
+import { HumanMessage, SystemMessage, AIMessage, tool, createAgent } from "langchain"
 import { ChatMistralAI } from "@langchain/mistralai";
+import * as z from "zod"
+import { searchInternet } from "./internet.service.js";
+
+const searchInternetTool = tool(
+    searchInternet,
+    {
+        name: "searchInternet",
+        description: "Use this tool to fetch real-time information from the internet about current events, news, or facts not in your training data.",
+        schema: z.object({
+            query: z.string().describe("The specific search terms or question to look up on the internet.")
+        })
+    }
+)
 
 const geminiModel = new ChatGoogleGenerativeAI({
   model: "gemini-2.5-flash-lite",
@@ -12,18 +25,31 @@ const mistralModel = new ChatMistralAI({
     apiKey: process.env.MISTRAL_API_KEY
 })
 
-export async function generateResponse(messages){
-    const response = await geminiModel.invoke([
-        new HumanMessage(messages.map(msg=>{
-            if(msg.role == "user"){
-                return new HumanMessage(msg.content)
-            }else if(msg.role == "ai"){
-                return new AIMessage(msg.content)
-            }
-        }))
-    ])   
+const agent = createAgent({
+    model: mistralModel,
+    tools: [ searchInternetTool]
+})
 
-    return response.text
+export async function generateResponse(messages){
+    
+    const response = await agent.invoke({
+        messages: [
+            new SystemMessage(`
+                You are a helpful and precise assistant for answering questions.
+                If you don't know the answer, say you don't know. 
+                If the question requires up-to-date information, use the "searchInternet" tool to get the latest information from the internet and then answer based on the search results.
+            `),
+            ...(messages.map(msg => {
+                if (msg.role == "user") {
+                    return new HumanMessage(msg.content)
+                } else if (msg.role == "ai") {
+                    return new AIMessage(msg.content)
+                }
+            })) ]
+    });
+
+
+    return response.messages[ response.messages.length - 1 ].text
 }
 
 export async function generateChatTitle(message){
