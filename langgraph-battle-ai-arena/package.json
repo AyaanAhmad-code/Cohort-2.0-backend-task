@@ -1,5 +1,5 @@
 {
-  "name": "langraph-battle-ai-arena",
+  "name": "langgraph-battle-ai-arena",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -10,7 +10,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
     "@types/express": "^5.0.6",
     "tsx": "^4.21.0",
@@ -23,5 +22,6 @@
     "@langchain/mistralai": "^1.0.7",
     "dotenv": "^17.3.1",
     "express": "^5.2.1"
-  }
+  },
+  "description": ""
 }
