@@ -10,6 +10,6 @@ COPY . .
 
 EXPOSE 3000
 
-RUN mkdir workspace
+RUN mkdir /workspace
 
 CMD [ "node", "server.js" ]

@@ -1,6 +1,7 @@
 import express from 'express';
 import morgan from 'morgan';
 import fs from 'fs';
+import path from 'path';
 
 const WORKING_DIR = '/workspace';
 
@@ -69,7 +70,7 @@ app.get("/read-files", async (req, res) => {
 
     const fileList = files.split(',');
 
-    await Promise.all(fileList.map(async (file) => {
+    const results = await Promise.all(fileList.map(async (file) => {
         const filePath = path.join(WORKING_DIR, file);
 
         try {
@@ -84,9 +85,14 @@ app.get("/read-files", async (req, res) => {
         }
     }));
 
+    res.status(200).json({
+        message: 'File contents',
+        files: results,
+    });
+
 });
 
-app.patch('/update-file', async (req, res) => {
+app.patch('/update-files', async (req, res) => {
     const updates = req.body.updates;
 
     if(!updates || !Array.isArray(updates)) {
@@ -104,11 +110,11 @@ app.patch('/update-file', async (req, res) => {
             await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
             await fs.promises.writeFile(filePath, content, 'utf-8');
             return {
-                [filePath.replace(WORKING_DIR, '')]: 'File updated successfully'
+                [filePath]: 'File updated successfully'
             }
         } catch (error) {
             return {
-                [filePath.replace(WORKING_DIR, '')]: `Error updating file: ${error.message}`
+                [filePath]: `Error updating file: ${error.message}`
             }
         }
     }));
@@ -138,11 +144,11 @@ app.post('/create-file', async (req, res) => {
             await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
             await fs.promises.writeFile(filePath, content, 'utf-8');
             return {
-                [filePath.replace(WORKING_DIR, '')]: 'File created successfully'
+                [filePath]: 'File created successfully'
             }
         } catch (error) {
             return {
-                [filePath.replace(WORKING_DIR, '')]: `Error creating file: ${error.message}`
+                [filePath]: `Error creating file: ${error.message}`
             }
         }
     }));
@@ -152,31 +158,6 @@ app.post('/create-file', async (req, res) => {
         message: 'Files created successfully',
         status: 'success'
     });
-});
-
-app.delete('/delete-file', async (req, res) => {
-    const file = req.query.file;
-    if(!file) {
-        return res.status(400).json({
-            message: 'No file specified',
-            status: 'error'
-        });
-    }
-
-    const filePath = path.join(WORKING_DIR, file);
-
-    try {
-        await fs.promises.unlink(filePath);
-        res.status(200).json({
-            message: 'File deleted successfully',
-            status: 'success'
-        });
-    } catch (error) {
-        res.status(500).json({
-            message: `Error deleting file: ${error.message}`,
-            status: 'error'
-        });
-    }
 });
 
 export default app;
