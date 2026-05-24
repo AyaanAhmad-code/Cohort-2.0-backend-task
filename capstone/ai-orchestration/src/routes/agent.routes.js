@@ -14,7 +14,7 @@ agentRouter.post("/invoke", async (req, res) => {
     });
 
     const writer = (text) => res.write(text);
-
+    
     const response = await agent.stream(
       {
         messages: [

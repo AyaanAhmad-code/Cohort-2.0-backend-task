@@ -11,6 +11,10 @@ metadata:
     
     # Time in seconds to establish a connection to the pod
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "6000"
+
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    
+    nginx.ingress.kubernetes.io/session-cookie-name: "route"
   labels:
     app.kubernetes.io/name: codespace-ingress
 spec:
@@ -47,7 +51,7 @@ spec:
             port:
               number: 80
 
-  - host: "*.agent.localhost"
+  - host: "*.agent.localhost.direct"
     http:
       paths:
       - pathType: Prefix
