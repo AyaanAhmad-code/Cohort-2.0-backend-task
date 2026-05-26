@@ -5,13 +5,11 @@ export const createService = async (sanboxId) => {
         metadata: {
             name: `sandbox-service-${sanboxId}`,
             labels: {
-                app: 'sandbox',
                 sandboxId: sanboxId
             }
         },
         spec: {
             selector: {
-                app: 'sandbox',
                 sandboxId: sanboxId
             },
             ports: [
