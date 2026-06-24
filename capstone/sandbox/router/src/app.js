@@ -3,10 +3,10 @@ import morgan from 'morgan';
 import { createProxyMiddleware } from "http-proxy-middleware";
 import http from 'http';
 import { createProxyServer } from 'httpxy';
-// import { refreshTTL } from './config/redis.js';
+import { refreshTTL } from './config/redis.js';
 
 const app = express();
-app.use(morgan('combined'));
+app.use(morgan('dev'));
 
 app.get('/api/status/healthz', (req, res) => {
     res.status(200).json({ status: 'ok' });
@@ -52,7 +52,7 @@ app.use(async (req, res, next) => {
     const host = req.headers.host;
     const sandboxId = host.split('.')[ 0 ];
 
-    // await refreshTTL(sandboxId);
+    await refreshTTL(sandboxId);
 
     if (host.split('.')[ 1 ] === 'agent') {
         return getAgentProxy(sandboxId)(req, res, next);

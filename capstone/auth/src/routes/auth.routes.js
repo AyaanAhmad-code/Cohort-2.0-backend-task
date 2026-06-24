@@ -2,6 +2,7 @@ import { Router } from "express";
 import passport from "passport";
 import userModel from "../models/user.model.js";
 import jwt from "jsonwebtoken";
+import { sendAuthNotification } from "../config/mq.js";
 
 const router = Router();
 
@@ -10,7 +11,7 @@ router.get('/google',passport.authenticate('google', {session: false, scope: [ '
 router.get('/google/callback', passport.authenticate('google', { session: false, failureRedirect: '/' }), async (req,res)=> {
     try {
         const { id, displayName, emails, photos } = req.user;
-        let user = await userModel.findOne({ googleID });
+        let user = await userModel.findOne({ googleID: id });
 
         if(!user){
             user = new userModel({
@@ -21,10 +22,18 @@ router.get('/google/callback', passport.authenticate('google', { session: false,
             });
             await user.save();
         }
+
+        await sendAuthNotification({
+            userId: user._id,
+            action: 'google_login',
+            timestamp: new Date(),
+            emails: emails[0].value
+        })
+        
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.cookie('token', token, { httpOnly: true });
-        res.redirect('/')
+        res.redirect('http://localhost:5173')
     } catch (error) {
         console.error('Error during Google authentication:',error);
         res.redirect('/')

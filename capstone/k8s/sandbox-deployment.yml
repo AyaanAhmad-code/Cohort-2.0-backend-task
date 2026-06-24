@@ -16,7 +16,7 @@ spec:
     spec:
       serviceAccountName:  resource-manager
       containers:
-      - image:  sandbox:latest
+      - image:  277869548052.dkr.ecr.ap-south-1.amazonaws.com/sandbox
         name:  main-sandbox-container
         resources:
           limits:
@@ -31,6 +31,22 @@ spec:
             port: 3000
           initialDelaySeconds: 90
           timeoutSeconds: 10
+        env:
+          - name: REDIS_URL
+            valueFrom:
+              secretKeyRef:
+                name: codespace-secrets
+                key: REDIS_URL
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: codespace-secrets 
+                key: JWT_SECRET
+          - name:  MONGO_URI
+            valueFrom:
+              secretKeyRef:
+                name:  codespace-secrets
+                key: SANDBOX
         readinessProbe:
           httpGet:
             path: /api/sandbox/health
